@@ -24,10 +24,6 @@
  * THE SOFTWARE.
  */
 
-#ifndef HiPushButton_h
-#define HiPushButton_h
-
-#include <Arduino.h>
 #include "HIPushButton.h"
 
 // ----------------------------------------------------------
@@ -35,15 +31,15 @@
 // ----------------------------------------------------------
 // Only member variable initialization here. Arduino best practice
 
-HIPushButton::HIPushButton (uint8_t pin, uint8_t pinLevelPush, bool enablePullups , uint8_t value, unsigned long debounceMillis, unsigned long holdTimeMillis) {     
+HIPushButton::HIPushButton (uint8_t pin, uint8_t pinLevelPush, bool enablePullups , uint8_t value, unsigned long debounceMillis, unsigned long holdTimeMillis) {
 
       _pin = pin;
 
       // Logic level when button pushed
       if (pinLevelPush != NULL) _pinLevelPush = pinLevelPush;
-      
+
       // Pullups
-      if ( enablePullups != NULL ) _enablePullups = enablePullups;      
+      if ( enablePullups != NULL ) _enablePullups = enablePullups;
 
       // By default button value is set to pin
       if (value == NULL ) _value = _pin ;  else _value = value;
@@ -54,7 +50,7 @@ HIPushButton::HIPushButton (uint8_t pin, uint8_t pinLevelPush, bool enablePullup
 
       // Initial state machine state = released
       _previousPinState       = ! _pinLevelPush ; // Released
-      _state = _previousState = btnStateReleased; 
+      _state = _previousState = btnStateReleased;
 
 }
 
@@ -66,7 +62,7 @@ void HIPushButton::begin() {
        pinMode(_pin, INPUT);
 
       // Enable pullups internal resitors if asked
-      if (_enablePullups) digitalWrite(_pin, HIGH);        
+      if (_enablePullups) digitalWrite(_pin, HIGH);
 }
 
 // ----------------------------------------------------------
@@ -84,7 +80,7 @@ bool HIPushButton::debounce(bool reset, unsigned long debounceMillis ){
       dMillis = debounceMillis;
       pMillis = millis();
     } else if ( !debounced && (millis() - pMillis) > dMillis ) debounced = true;
-    
+
     return debounced;
 }
 // ----------------------------------------------------------
@@ -97,21 +93,18 @@ void HIPushButton::resetStateCounters() {
 // ----------------------------------------------------------
 // GETTERS
 // ----------------------------------------------------------
-
-HIPushButton::btnState      HIPushButton::getState() { return _state ; };
-HIPushButton::btnState      HIPushButton::getPreviousState(){ return _previousState ; };
-unsigned int  HIPushButton::getHoldedCount() { return _holdedCount;}
-unsigned int  HIPushButton::getPressedCount() { return _pressedCount; }
-uint8_t       HIPushButton::getValue() { return _value; }
+HIPushButton::btnState HIPushButton::getState() { return _state ; };
+HIPushButton::btnState HIPushButton::getPreviousState(){ return _previousState ; };
+unsigned int           HIPushButton::getHoldedCount() { return _holdedCount;}
+unsigned int           HIPushButton::getPressedCount() { return _pressedCount; }
+uint8_t                HIPushButton::getValue() { return _value; }
 
 // ----------------------------------------------------------
 // SETTERS
 // ----------------------------------------------------------
-
-void          HIPushButton::setValue(uint8_t value) { _value = value ;}
-void          HIPushButton::setDebounceTime(unsigned long debounceMillis) { _debounceMillis = debounceMillis;}
-void          HIPushButton::setHoldTime(unsigned long holdTimeMillis) { _holdTimeMillis = holdTimeMillis; }
-
+void HIPushButton::setValue(uint8_t value) { _value = value ;}
+void HIPushButton::setDebounceTime(unsigned long debounceMillis) { _debounceMillis = debounceMillis;}
+void HIPushButton::setHoldTime(unsigned long holdTimeMillis) { _holdTimeMillis = holdTimeMillis; }
 
 // ----------------------------------------------------------
 // pressed. Evaluate if a button was pressed.
@@ -124,10 +117,28 @@ bool HIPushButton::pressed() {
 }
 
 // ----------------------------------------------------------
+// holded. Evaluate if a button was holded.
+// ----------------------------------------------------------
+// Use this instead of read to filter only "holded" state
+
+bool HIPushButton::holded() {
+    if ( stateMachine() == btnStateHolded ) return true;
+    return false;
+}
+// ----------------------------------------------------------
 // read. Read button state
 // ----------------------------------------------------------
 
 HIPushButton::btnState HIPushButton::read() { return stateMachine(); }
+
+
+// ----------------------------------------------------------
+// logicRead. internal
+// ----------------------------------------------------------
+// Method that read the logic level
+uint8_t HIPushButton::logicRead() {
+  return digitalRead(_pin) ;
+}
 
 // ----------------------------------------------------------
 // stateMachine. internal
@@ -140,13 +151,13 @@ HIPushButton::btnState HIPushButton::stateMachine() {
      bool         pinStateChanged;     // True is pin state changed
      static bool  holded = false;      // True if button holded more than debounce+holded time
      static bool  debounced = false;   // True is button debounced
-     
+
      nextState = btnStateUnknwow;
-      
-     // State transition : 
+
+     // State transition :
      //  btnStateReleased => btnStatePushed => btnStateHolded => btnStatePushed (=> btnStateReleased)
- 
-     p = digitalRead(_pin) ;
+
+     p = logicRead() ;
      buttonOn = ( p == _pinLevelPush  );
      pinStateChanged =  ( p != _previousPinState );
 
@@ -163,20 +174,20 @@ HIPushButton::btnState HIPushButton::stateMachine() {
               if ( !debounced ) {
                  if ( debounce() ) {
                     debounce(true,_holdTimeMillis);
-                    debounced = true;               
-                 } 
-                 nextState = btnStatePushed;         
-              } 
+                    debounced = true;
+                 }
+                 nextState = btnStatePushed;
+              }
               else if ( ! holded ) {
-                 if ( debounce() ) {                    
+                 if ( debounce() ) {
                     holded = true;
                     _holdedCount++;
                     nextState = btnStateHolded;
-                 } else nextState = btnStatePushed;                                                   
+                 } else nextState = btnStatePushed;
               }
           }
         }
-     } 
+     }
      else {
         if (pinStateChanged) {
           if (debounced && !holded ) {
@@ -190,5 +201,3 @@ HIPushButton::btnState HIPushButton::stateMachine() {
      _state = nextState;
      return _state;
 }
-
-#endif
