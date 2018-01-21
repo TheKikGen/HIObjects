@@ -30,28 +30,50 @@
 #include <Arduino.h>
 #include "HIPushButton.h"
 
+// ----------------------------------------------------------
 // Constructor
-HIPushButton::HIPushButton (uint8_t pin) {
-      
-      _pin = pin;
-      _previousPinState = ! _pinLevelPush ; // Released
-      _state = _previousState = btnStateReleased;
+// ----------------------------------------------------------
+// Only member variable initialization here. Arduino best practice
 
-      _thisInstanceRegisterIndex = _instanceRegisterIndex ;
-          _instanceRegister[_thisInstanceRegisterIndex] = this;
-      _instanceRegisterIndex ++;         
+HIPushButton::HIPushButton (uint8_t pin, uint8_t pinLevelPush, bool enablePullups , uint8_t value, unsigned long debounceMillis, unsigned long holdTimeMillis) {     
+
+      _pin = pin;
+
+      // Logic level when button pushed
+      if (pinLevelPush != NULL) _pinLevelPush = pinLevelPush;
+      
+      // Pullups
+      if ( enablePullups != NULL ) _enablePullups = enablePullups;      
+
+      // By default button value is set to pin
+      if (value == NULL ) _value = _pin ;  else _value = value;
+
+      // Debounce and Holded time
+      if ( debounceMillis != NULL ) _debounceMillis = debounceMillis;
+      if ( holdTimeMillis != NULL ) _holdTimeMillis = holdTimeMillis;
+
+      // Initial state machine state = released
+      _previousPinState       = ! _pinLevelPush ; // Released
+      _state = _previousState = btnStateReleased; 
+
 }
 
+// ----------------------------------------------------------
+// Begin.  Must be called from setup()
+// ----------------------------------------------------------
 void HIPushButton::begin() {
       // Set pin to input.
        pinMode(_pin, INPUT);
+
       // Enable pullups internal resitors if asked
-      if (_enablePullups) digitalWrite(_pin, HIGH);  
+      if (_enablePullups) digitalWrite(_pin, HIGH);        
 }
 
-static int HIPushButton::_instanceRegisterIndex=0;
-static HIPushButton* HIPushButton::_instanceRegister[]={NULL,NULL,NULL,NULL};
- 
+// ----------------------------------------------------------
+// Debounce. Used when a button is pushed or holded
+// ----------------------------------------------------------
+// Passing true will start deboucing.
+
 bool HIPushButton::debounce(bool reset, unsigned long debounceMillis ){
     static bool debounced = false;
     static unsigned long dMillis;
@@ -65,39 +87,53 @@ bool HIPushButton::debounce(bool reset, unsigned long debounceMillis ){
     
     return debounced;
 }
-
+// ----------------------------------------------------------
+// resetStateCounters : Reset press/hold counters
+// ----------------------------------------------------------
 void HIPushButton::resetStateCounters() {
     _holdedCount = _pressedCount = 0;
 }
 
-unsigned int HIPushButton::getHoldedCount() {
-    return _holdedCount;
-}
+// ----------------------------------------------------------
+// GETTERS
+// ----------------------------------------------------------
 
-unsigned int HIPushButton::getPressedCount() {
-    return _pressedCount;
-}
- 
-void HIPushButton::setDebounceTime(unsigned long debounceMillis) {
-    _debounceMillis = debounceMillis;    
-}
+HIPushButton::btnState      HIPushButton::getState() { return _state ; };
+HIPushButton::btnState      HIPushButton::getPreviousState(){ return _previousState ; };
+unsigned int  HIPushButton::getHoldedCount() { return _holdedCount;}
+unsigned int  HIPushButton::getPressedCount() { return _pressedCount; }
+uint8_t       HIPushButton::getValue() { return _value; }
 
-void HIPushButton::setHoldTime(unsigned long holdTimeMillis) {
-    _holdTimeMillis = holdTimeMillis;    
-}
+// ----------------------------------------------------------
+// SETTERS
+// ----------------------------------------------------------
 
-// Evaluate if a button was pressed.
+void          HIPushButton::setValue(uint8_t value) { _value = value ;}
+void          HIPushButton::setDebounceTime(unsigned long debounceMillis) { _debounceMillis = debounceMillis;}
+void          HIPushButton::setHoldTime(unsigned long holdTimeMillis) { _holdTimeMillis = holdTimeMillis; }
+
+
+// ----------------------------------------------------------
+// pressed. Evaluate if a button was pressed.
+// ----------------------------------------------------------
 // Use this instead of read to filter only "pressed" state
-uint8_t HIPushButton::pressed() {
 
+bool HIPushButton::pressed() {
+    if ( stateMachine() == btnStatePressed ) return true;
+    return false;
 }
 
-uint8_t HIPushButton::read() {
-     return stateMachine();
-}
+// ----------------------------------------------------------
+// read. Read button state
+// ----------------------------------------------------------
 
+HIPushButton::btnState HIPushButton::read() { return stateMachine(); }
+
+// ----------------------------------------------------------
+// stateMachine. internal
+// ----------------------------------------------------------
 // Evaluate button state. Return all buttons state.
-uint8_t HIPushButton::stateMachine() {
+HIPushButton::btnState HIPushButton::stateMachine() {
      uint8_t      p;                   // pin value
      uint8_t      nextState;           // next state
      bool         buttonOn;            // True is button pushed

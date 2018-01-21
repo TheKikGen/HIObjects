@@ -14,38 +14,10 @@ Serial.begin(115200);
 lcd.begin(16, 2);
 myButton.begin() ;
 
+
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-
-/*
-unsigned long t1,t2,t3;
-
-t1=millis(); 
-myButton.debounce(true,1000);
-while (!myButton.debounce());
-t1 = millis() - t1;
-Serial.println(t1);
-
-t1=millis(); 
-!myButton.debounce(true,2000);
-while (!myButton.debounce());
-t1 = millis() - t1;
-Serial.println(t1);
-*/
-
- 
-
-
-
-
-
-
-
-
-
-
 
 int r = myButton.read();
 
@@ -65,6 +37,13 @@ case HIPushButton::btnStatePressed:
 case HIPushButton::btnStateHolded:  
     lcd.setCursor(0,1);lcd.print("Holded  ");
     delay(1000);
+    lcd.setCursor(0,1);lcd.print("Waiting press..."); 
+    while ( !myButton.pressed() ) ;
+    lcd.setCursor(0,1);lcd.print("Value = ");lcd.print(myButton.getValue());lcd.print("     ");
+    delay(2000);
+    
+    break;
+
     break;
 
 
