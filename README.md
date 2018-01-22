@@ -35,3 +35,6 @@ if ( myKeypad.holded() ) v = myKeypad.getValue();
 while ( !myButton.pressed() ) ;
 ```
 
+## TODO :
+* Create a factory to create and manage instance (eg : create a "panel" object with 10 buttons
+* Add HIPotentiometer, HiRotaryEncoder....
