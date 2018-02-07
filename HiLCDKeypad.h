@@ -1,4 +1,3 @@
-/*!
 /**********************************************************************************
  *  LCD keypad class
  *  Header file.
@@ -58,7 +57,8 @@ class HILCDKeypad: public HIPushButton   {
   btnValue           _previousValue  =  btnNone;      // Previous value.
  public:
   // Constructor
-  HILCDKeypad (uint8_t pin, unsigned long debounceMillis = NULL, unsigned long holdTimeMillis = NULL);
+   HILCDKeypad (uint8_t pin, unsigned long debounceMillis = 50 , unsigned long holdTimeMillis = 950 );
+
 
  virtual void      begin();
   btnValue          getValue();

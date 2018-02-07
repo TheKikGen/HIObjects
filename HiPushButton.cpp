@@ -1,4 +1,3 @@
-/*!
 /**********************************************************************************
  *  Digital Button class
  *  Class file
@@ -31,22 +30,11 @@
 // ----------------------------------------------------------
 // Only member variable initialization here. Arduino best practice
 
-HIPushButton::HIPushButton (uint8_t pin, uint8_t pinLevelPush, bool enablePullups , uint8_t value, unsigned long debounceMillis, unsigned long holdTimeMillis) {
-
-      _pin = pin;
-
-      // Logic level when button pushed
-      if (pinLevelPush != NULL) _pinLevelPush = pinLevelPush;
-
-      // Pullups
-      if ( enablePullups != NULL ) _enablePullups = enablePullups;
+HIPushButton::HIPushButton (uint8_t pin, uint8_t pinLevelPush, bool enablePullups , uint8_t value, unsigned long debounceMillis, unsigned long holdTimeMillis)
+      : _pin(pin), _pinLevelPush(pinLevelPush), _enablePullups(enablePullups), _value(value), _debounceMillis(debounceMillis), _holdTimeMillis(holdTimeMillis) {
 
       // By default button value is set to pin
-      if (value == NULL ) _value = _pin ;  else _value = value;
-
-      // Debounce and Holded time
-      if ( debounceMillis != NULL ) _debounceMillis = debounceMillis;
-      if ( holdTimeMillis != NULL ) _holdTimeMillis = holdTimeMillis;
+      if (value == 255 ) _value = _pin ;  else _value = value;
 
       // Initial state machine state = released
       _previousPinState       = ! _pinLevelPush ; // Released
@@ -146,13 +134,13 @@ uint8_t HIPushButton::logicRead() {
 // Evaluate button state. Return all buttons state.
 HIPushButton::btnState HIPushButton::stateMachine() {
      uint8_t      p;                   // pin value
-     uint8_t      nextState;           // next state
+     btnState     nextState;           // next state
      bool         buttonOn;            // True is button pushed
      bool         pinStateChanged;     // True is pin state changed
      static bool  holded = false;      // True if button holded more than debounce+holded time
      static bool  debounced = false;   // True is button debounced
 
-     nextState = btnStateUnknwow;
+     nextState = btnStateUnknow;
 
      // State transition :
      //  btnStateReleased => btnStatePushed => btnStateHolded => btnStatePushed (=> btnStateReleased)

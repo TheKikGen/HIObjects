@@ -1,4 +1,3 @@
-/*!
 /**********************************************************************************
  *  Digital Button class
  *  Header file.
@@ -42,7 +41,7 @@ class HIPushButton {
  public:
    // Enumeration of Button state
    enum btnState {
-    btnStateUnknwow      = 255,
+    btnStateUnknow      = 255,
     btnStateReleased     = 0,
     btnStatePushed       = 1,
     btnStatePressed      = 2,
@@ -50,25 +49,25 @@ class HIPushButton {
    };
 
  private:
-   
- protected:
+       
+ protected:  
+  uint8_t             _pin              = 0;               // Arduino pin assigned
+  uint8_t             _pinLevelPush     = LOW;             // Logic when button pressed
+  boolean             _enablePullups    = true;            // True if internal pullups must be set. Specific to digital button.
+  uint8_t             _value            = 255;             // Button value.
+  unsigned long       _debounceMillis   = 50;              // Delay to debounce when button pushed
+  unsigned long       _holdTimeMillis   = 950;             // Delay of holding (from button on)
 
-  btnState            _state  ;                  // Current button state
-  btnState            _previousState ;           // Previous button state
-  uint8_t             _pin;                      // Arduino pin assigned
-  uint8_t             _previousPinState ;        // Previous pin state
-  boolean             _enablePullups  =  true;   // True if internal pullups must be set. Specific to digital button.
-  uint8_t             _pinLevelPush   =  LOW;    // Logic when button pressed
-  unsigned long       _debounceMillis =  50;     // Delay to debounce when button pushed
-  unsigned long       _holdTimeMillis =  950;    // Delay of holding (from button on)
-  unsigned int        _holdedCount    =  0;      // Count number of holded events
-  unsigned int        _pressedCount   =  0;      // Count number of pressed events
-  uint8_t             _value          =  255;    // Button value.
+  btnState            _state            = btnStateUnknow; // Current button state
+  btnState            _previousState    = btnStateUnknow; // Previous button state
+  uint8_t             _previousPinState = 0 ;              // Previous pin state
+  unsigned int        _holdedCount      = 0;               // Count number of holded events
+  unsigned int        _pressedCount     = 0;               // Count number of pressed events
 
   public:
   // Constructor
-  HIPushButton (uint8_t pin, uint8_t pinLevelPush = NULL, bool enablePullups = NULL, uint8_t value = NULL, unsigned long debounceMillis = NULL, unsigned long holdTimeMillis = NULL);
-
+  HIPushButton (uint8_t pin, uint8_t pinLevelPush = LOW , bool enablePullups = true, uint8_t value = 255, unsigned long debounceMillis = 50 , unsigned long holdTimeMillis = 950 );
+ 
   protected:
   
   bool              debounce(bool reset=false, unsigned long debounceMillis=0 );

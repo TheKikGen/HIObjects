@@ -1,4 +1,3 @@
-/*!
 /**********************************************************************************
  *  LCD Keypad class
  *  Class file
@@ -30,7 +29,7 @@
 // Constructor
 // ----------------------------------------------------------
 // Only member variable initialization here. Arduino best practice
-HILCDKeypad::HILCDKeypad (uint8_t pin, unsigned long debounceMillis, unsigned long holdTimeMillis) :  HIPushButton(pin,NULL,false,btnNone,debounceMillis, holdTimeMillis) {
+HILCDKeypad::HILCDKeypad (uint8_t pin, unsigned long debounceMillis, unsigned long holdTimeMillis) :  HIPushButton(pin,LOW,true,btnNone,debounceMillis, holdTimeMillis) {
 
 }
 

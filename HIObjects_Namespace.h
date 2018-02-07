@@ -1,4 +1,4 @@
-/*!
+/*
  * HIObjects namespace
  */
 
