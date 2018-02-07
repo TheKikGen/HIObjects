@@ -61,16 +61,16 @@ HILCDKeypad::btnValue HILCDKeypad::lcdKeypadReadPinValue() {
     int adcKeyPressed ;
     uint8_t i=0;
 
-    if ( (adcKeyPressed = analogRead(_pin))  > 1000) return btnNone;
+    if ( (adcKeyPressed = analogRead(_pin))  > keypadPinThreshold[0]) return btnNone;
     while ( (adcKeyPressed = analogRead(_pin)) - analogRead(_pin)  + analogRead(_pin) - analogRead(_pin) + analogRead(_pin) - analogRead(_pin) ) {
       if ( i++ > 20 ) return btnNone;
     }
-    if (adcKeyPressed < 120)  return btnRight;    // 0
-    if (adcKeyPressed < 250)  return btnUp;       // 130
-    if (adcKeyPressed < 450)  return btnDown;     // 305
-    if (adcKeyPressed < 650)  return btnLeft;     // 478
-    if (adcKeyPressed < 850)  return btnSelect;   // 720
-    return btnNone; // when all others fail...
+    if (adcKeyPressed < keypadPinThreshold[1])  return btnRight;   // 0
+    if (adcKeyPressed < keypadPinThreshold[2])     return btnUp;   // 130
+    if (adcKeyPressed < keypadPinThreshold[3])   return btnDown;   // 305
+    if (adcKeyPressed < keypadPinThreshold[4])   return btnLeft;   // 478
+    if (adcKeyPressed < keypadPinThreshold[5]) return btnSelect;   // 720
+    return btnNone; // when all others failed...
 }
 
 // ----------------------------------------------------------

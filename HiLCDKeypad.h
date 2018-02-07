@@ -44,7 +44,7 @@ typedef uint8_t byte;
 class HILCDKeypad: public HIPushButton   {
   public:
    // Enumeration of Button name
-   enum btnValue {
+   enum btnValue :uint8_t  {
     btnNone              = 0,
     btnRight             = 1,
     btnUp                = 2,
@@ -52,24 +52,29 @@ class HILCDKeypad: public HIPushButton   {
     btnLeft              = 4,
     btnSelect            = 5
    };
+  
+   
  private: 
   btnValue           _value          =  btnNone;      // Button value.
-  btnValue           _previousValue  =  btnNone;      // Previous value.
+  btnValue           _previousValue  =  btnNone;      // Previous value.  
+  
+  int keypadPinThreshold[6]= {1000,120,250,450,650,850}; // None, Right, Up, Down, Left, Select
+
  public:
   // Constructor
    HILCDKeypad (uint8_t pin, unsigned long debounceMillis = 50 , unsigned long holdTimeMillis = 950 );
-
-
- virtual void      begin();
-  btnValue          getValue();
+   
+    virtual void         begin();
+    btnValue             getValue();
  
  private:
-  btnValue          lcdKeypadReadPinValue();
-  // Digital "Logic" is simulated here
-  virtual uint8_t   logicRead() ;
-  // Mask public setValue and getValue as keypad is multivalued in an enum type
-  using HIPushButton::getValue;
-  using HIPushButton::setValue;
+    virtual  btnValue     lcdKeypadReadPinValue();
+    // Digital "Logic" is simulated here
+    virtual uint8_t       logicRead() ;
+
+    // Mask public setValue and getValue as keypad is multivalued in an enum type
+    using HIPushButton::getValue;
+    using HIPushButton::setValue;
 };
 
 #endif

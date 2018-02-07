@@ -58,8 +58,8 @@ class HIPushButton {
   unsigned long       _debounceMillis   = 50;              // Delay to debounce when button pushed
   unsigned long       _holdTimeMillis   = 950;             // Delay of holding (from button on)
 
-  btnState            _state            = btnStateUnknow; // Current button state
-  btnState            _previousState    = btnStateUnknow; // Previous button state
+  btnState            _state            = btnStateUnknow;  // Current button state
+  btnState            _previousState    = btnStateUnknow;  // Previous button state
   uint8_t             _previousPinState = 0 ;              // Previous pin state
   unsigned int        _holdedCount      = 0;               // Count number of holded events
   unsigned int        _pressedCount     = 0;               // Count number of pressed events
@@ -69,27 +69,24 @@ class HIPushButton {
   HIPushButton (uint8_t pin, uint8_t pinLevelPush = LOW , bool enablePullups = true, uint8_t value = 255, unsigned long debounceMillis = 50 , unsigned long holdTimeMillis = 950 );
  
   protected:
-  
-  bool              debounce(bool reset=false, unsigned long debounceMillis=0 );
-  btnState          stateMachine(); 
-  virtual uint8_t   logicRead();
-  
+    virtual bool         debounce(bool reset=false, unsigned long debounceMillis=0 );
+    virtual btnState     stateMachine(); 
+    virtual uint8_t      logicRead();
+    
   public:
-
-  virtual void    begin();
-  uint8_t getValue();
-  void    setValue(uint8_t value);
-  
-  btnState        read();
-  bool            pressed() ;
-  bool            holded() ;
-  void            resetStateCounters() ;
-  btnState        getState();
-  btnState        getPreviousState();
-  unsigned int    getHoldedCount();
-  unsigned int    getPressedCount();
-  void            setDebounceTime(unsigned long debounceMillis);
-  void            setHoldTime(unsigned long holdTimeMillis);
-  
+    virtual void         begin();
+    uint8_t              getValue();
+    virtual void         setValue(uint8_t value);
+    
+    virtual btnState     read();
+    virtual bool         pressed() ;
+    virtual bool         holded() ;
+    virtual void         resetStateCounters() ;
+    virtual btnState     getState();
+    virtual btnState     getPreviousState();
+    virtual unsigned int getHoldedCount();
+    virtual unsigned int getPressedCount();
+    virtual void         setDebounceTime(unsigned long debounceMillis);
+    virtual void         setHoldTime(unsigned long holdTimeMillis);
 };
 #endif
